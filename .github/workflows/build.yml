@@ -16,9 +16,13 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      # Automatically sets up Bazel and the required Android SDK build variables
+      # Fixes the missing Android SDK / ANDROID_HOME location error natively
+      - name: Setup Android SDK Environment
+        uses: android-actions/setup-android@v3
+
+      # Fixes any underlying Bazel dependency compilation blocks
       - name: Set up Bazel Build Core
-        uses: bazel-contrib/setup-bazel@v0.13.0
+        uses: bazel-contrib/setup-bazel@v0.19.0
         with:
           bazel-version: '6.x'
 
@@ -30,14 +34,13 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
 
-      # Grants absolute permissions to the wrapper scripts
       - name: Set Execution Permissions
         run: |
           chmod +x gradlew
           chmod +x gradlew.bat
         working-directory: ./compiled_model_api/text_classification/kotlin_cpu/android
 
-      # Run the dedicated assembly build pipeline
+      # Run clean assembly build with absolute environment arguments
       - name: Run Production APK Assembly
         run: ./gradlew assembleDebug --no-daemon
         working-directory: ./compiled_model_api/text_classification/kotlin_cpu/android
