@@ -13,26 +13,11 @@ jobs:
       - name: Set up Java Environment
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          java-version: '17'
+          distribution: 'zulu'
 
-      # Fixes the missing Android SDK / ANDROID_HOME location error natively
       - name: Setup Android SDK Environment
         uses: android-actions/setup-android@v3
-
-      # Fixes any underlying Bazel dependency compilation blocks
-      - name: Set up Bazel Build Core
-        uses: bazel-contrib/setup-bazel@v0.19.0
-        with:
-          bazel-version: '6.x'
-
-      - name: Cache Build Gradle Elements
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
 
       - name: Set Execution Permissions
         run: |
@@ -40,7 +25,6 @@ jobs:
           chmod +x gradlew.bat
         working-directory: ./compiled_model_api/text_classification/kotlin_cpu/android
 
-      # Run clean assembly build with absolute environment arguments
       - name: Run Production APK Assembly
         run: ./gradlew assembleDebug --no-daemon
         working-directory: ./compiled_model_api/text_classification/kotlin_cpu/android
